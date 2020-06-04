@@ -5,7 +5,7 @@ Created on Mon Jun  1 15:18:09 2020
 @author: localuser
 """
 
-import signal_classs as sc
+import signal_class as sc
 import lstm_class4signal as lc
 import numpy as np
 import torch

@@ -20,6 +20,9 @@ def normalArray(data):
     mean_tr = np.mean(data)
     std_tr = np.std(data)
     normalizedata = (data -mean_tr)/std_tr
+    if np.isnan(normalizedata).any():
+        print("the data nan!")
+        return data
     return normalizedata
 
 def data2tensor(data):
