@@ -27,3 +27,4 @@ def normalArray(data):
 
 def data2tensor(data):
     return torch.FloatTensor(data)
+

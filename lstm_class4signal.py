@@ -12,7 +12,7 @@ import numpy as np
 
 
 # 定义常量
-INPUT_SIZE = 1  # 定义输入的特征数
+INPUT_SIZE = 2  # 定义输入的特征数
 HIDDEN_SIZE = 15    # 定义一个LSTM单元有多少个神经元
 DROP_RATE = 0.2    #  drop out概率
 LAYERS = 2         # 有多少隐层，一个隐层一般放一个LSTM单元
@@ -28,8 +28,7 @@ class lstm4signal(nn.Module):
             dropout = DROP_RATE,
             class_num = CLASS_NUM,
             batch_first = True    # 如果为True，输入输出数据格式是(batch, seq_len, feature)
-                                  # 为False，输入输出数据格式是(seq_len, batch, feature)，)
-                        
+                                  # 为False，输入输出数据格式是(seq_len, batch, feature)，)            
             ):
         super().__init__()
         
@@ -54,4 +53,6 @@ class lstm4signal(nn.Module):
                                           # 如果是双向LSTM，num_directions是2，单向是1
         output = self.hidden_out(r_out)
         return output
-    
+
+
+ls1 = lstm4signal()

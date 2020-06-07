@@ -26,12 +26,21 @@ class signal_data:
     def section(self):
         sec = self.time_domain[:self.piece_cnt*self.section_len].reshape((self.piece_cnt,self.section_len))
         return sec
-    
+    def compress(self,div = 2,need_envelope =True):
+        ##用于将数据进行压缩，以满足后续操作需求
+        if need_envelope:
+            sec = self.envelope()
+        else:
+            sec = self.section()
+        comp = np.zeros((sec.shape[0],sec.shape[1]//div))
+        for i in range(comp.shape[1]):
+            comp[:,i] = sec[:,i*div]
+        return comp
     def envelope(self):
-        sec = self.section()
-        enve = np.zeros_like(sec)
-        for i in range(sec.shape[0]):            
-            enve[i] = su.Envelop(sec[i])
+        secs = self.section()
+        enve = np.zeros_like(secs)
+        for i,sec in enumerate(secs):
+            enve[i] = su.Envelop(sec)
         return enve
     
     def fft(self,need_envelope = True):
@@ -44,3 +53,4 @@ class signal_data:
         return tempf[:,:self.section_len//2]
     def copydata2ts(self):
         return torch.FloatTensor(self.fft())
+

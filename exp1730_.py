@@ -45,18 +45,20 @@ class expriment:
         self.__need_envelope = need_envelope
         self.__is_first_train = True
         self.__signal_class_list = []
-        for i in range(self.__type_cnt):
 
-            sig_cls = sc.signal_data(data_list[i],i,rpm,sample_rate,piece_cnt,section_len)   ##一次采集信号的实例
+        for type_status, data_of_type in enumerate(data_list):
+            sig_cls = sc.signal_data(data_of_type,type_status,rpm,sample_rate,piece_cnt,section_len)   ##一次采集信号的实例
             self.__signal_class_list.append(sig_cls)
-        
     def __copy_data2ts(self):
-        data_train = np.zeros((self.__piece_cnt*self.__type_cnt,self.__section_len//2))
+        data_train = np.zeros((self.__piece_cnt*self.__type_cnt,self.__section_len//2,2))
         y_train = np.zeros(self.__piece_cnt*self.__type_cnt,dtype = 'int')
-        for i in range(self.__type_cnt):
-            data_train[i*self.__piece_cnt:(i+1)*self.__piece_cnt] = self.__signal_class_list[i].fft(self.__need_envelope)
-            y_train[i*self.__piece_cnt:(i+1)*self.__piece_cnt] = self.__signal_class_list[i].status
+        
+        for type_status, signal_of_type in enumerate(self.__signal_class_list):
+            data_train[type_status*self.__piece_cnt:(type_status+1)*self.__piece_cnt,:,0] = signal_of_type.fft(self.__need_envelope)
+            data_train[type_status*self.__piece_cnt:(type_status+1)*self.__piece_cnt,:,1] = signal_of_type.compress(2,self.__need_envelope)
             
+            y_train[type_status*self.__piece_cnt:(type_status+1)*self.__piece_cnt] = signal_of_type.status
+
             
             
         lt = np.arange(self.__piece_cnt*self.__type_cnt)        
@@ -74,7 +76,7 @@ class expriment:
         self.__copy_data2ts()
         self.__lstmmode = lc.lstm4signal(class_num=self.__type_cnt).to(device)
         self.__loss_fn = nn.CrossEntropyLoss().type(gpu_dtype)
-        self.__lstm_data_train_ts = self.data_train_ts[:,:,np.newaxis]
+        self.__lstm_data_train_ts = self.data_train_ts
         self.__is_first_train = False
      
     def __lstm_check_acc(self,mode,data_set,y_set):
