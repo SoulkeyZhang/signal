@@ -1,6 +1,4 @@
-/1730
-/1750
-/1772
+
 /48k Drive End Bearing Fault Data
 /12k drive end bearing fault data
 /fan end bearing fault data
@@ -11,3 +9,5 @@
 /readmatdata_1772.py
 /__pycache__
 datapool.py
+signal_process.drawio
+/.vscode
