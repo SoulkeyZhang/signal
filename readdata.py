@@ -6,8 +6,6 @@ Created on Wed May 20 16:27:14 2020
 """
 
 import scipy.io as sio
-import torch
-import numpy as  np
 
 
 import signalutility as su

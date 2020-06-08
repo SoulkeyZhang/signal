@@ -20,7 +20,7 @@ MODEL = 'LSTM'     # 模型名字
 CLASS_NUM = 4
 
 
-class lstm4signal(nn.Module):
+class Lstm_Signal(nn.Module):
     def __init__(self,      
             input_size = INPUT_SIZE, 
             hidden_size = HIDDEN_SIZE, 
@@ -55,4 +55,3 @@ class lstm4signal(nn.Module):
         return output
 
 
-ls1 = lstm4signal()

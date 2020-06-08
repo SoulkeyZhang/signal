@@ -6,18 +6,18 @@ Created on Sat May 23 10:35:10 2020
 """
 
 import numpy as np
-import signalutility as su
+from signalutility import Envelop
 import torch
 
 
-class signal_data:
+class SignalOfData:
     def __init__(self,data,sts,rpm,sr,piece_cnt=1,section_len = 0):
         self.rpm = rpm
         self.sample_rate = sr
         self.time_length = len(data)
         self.status = sts
         self.piece_cnt = piece_cnt
-        self.time_domain = su.normalArray(data)  ##将时域信号进行normalization
+        self.time_domain = data  ##将时域信号进行normalization
         if self.piece_cnt == 1:
             
             self.section_len = self.time_length
@@ -40,7 +40,7 @@ class signal_data:
         secs = self.section()
         enve = np.zeros_like(secs)
         for i,sec in enumerate(secs):
-            enve[i] = su.Envelop(sec)
+            enve[i] = Envelop(sec)
         return enve
     
     def fft(self,need_envelope = True):
