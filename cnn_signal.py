@@ -7,15 +7,16 @@ Created on Mon Jun  8 10:43:41 2020
 
 import torch.nn as nn
 import torch
-
+import numpy as np
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")        
 
 
-IN_CHANNEL = 2
-OUT_CHANNEL = 30
-KERNEL_SIZE = 10
-OUT_CHANNEL2 = 50
-KERNEL_SIZE2 = 5
+IN_CHANNEL = 1
+OUT_CHANNEL = 16
+KERNEL_SIZE = 64
+STRIDE = 16
+OUT_CHANNEL2 = 32
+KERNEL_SIZE2 = 3
 CLASS_NUM = 4
 class Flatten(nn.Module):
     def forward(self,x):
@@ -28,21 +29,28 @@ class CnnInSignal(nn.Module):
         super().__init__()
         self.__class_num = class_num
         self.cnn = nn.Sequential(
-                    nn.Conv1d(in_channels=IN_CHANNEL,out_channels=OUT_CHANNEL,kernel_size=KERNEL_SIZE,stride=1),
-                    nn.MaxPool1d(KERNEL_SIZE,stride=1),
-                    nn.ReLU(),  ##这里需要输入的数据长度，暂时没想好怎么传递，这里直接给的立即数，需要修改
-                    nn.BatchNorm1d(OUT_CHANNEL),
+                    nn.Conv1d(in_channels=IN_CHANNEL,out_channels=OUT_CHANNEL,kernel_size=KERNEL_SIZE,stride=STRIDE),
+#                    nn.BatchNorm1d(OUT_CHANNEL),
+                    nn.ReLU(), 
+                    nn.MaxPool1d(2,stride=1),
+                    
                     nn.Conv1d(in_channels=OUT_CHANNEL,out_channels=OUT_CHANNEL2,kernel_size=KERNEL_SIZE2,stride=1),
-                    nn.MaxPool1d(KERNEL_SIZE2,stride=KERNEL_SIZE2),
+#                    nn.BatchNorm1d(OUT_CHANNEL2),
                     nn.ReLU(),
-                    nn.BatchNorm1d(OUT_CHANNEL2),
+                    nn.MaxPool1d(2,stride=2),
                     Flatten()
+#                    nn.Dropout(0.2)
                 )
         
     def forward(self,x):
-        x_T = x.transpose(1,2)
-        cnn_output = self.cnn(x_T)
-        self.affine = nn.Linear(cnn_output.shape[1],self.__class_num).to(device) ##这里由于模型的尺寸需要输入的数据信息，所以不能在构造的时候初始化，所以需要手动和构造保持一致性
+        cnn_output = self.cnn(x)
+        
+        self.affine = nn.Sequential(
+                                    nn.Linear(cnn_output.shape[1],32),
+                                    nn.ReLU(),
+                                    nn.Linear(32,self.__class_num),
+                                    ).to(device)
+        
         return self.affine(cnn_output)
               
 
